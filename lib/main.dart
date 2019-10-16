@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fsql/screens/addDBConnection.dart';
 import 'package:fsql/themes/theme.dart';
 import 'package:fsql/utils/router.dart';
 import 'package:fsql/utils/store.dart';
@@ -16,11 +15,13 @@ class MyApp extends StatelessWidget {
       theme: defaultTheme,
       //  home: MyHomePage(title: 'FranciumSQL'),
       onGenerateRoute: Router.generateRoute,
-      initialRoute: 'resultTable',
+      initialRoute: '/',
     );
   }
 
   getStorage() async {
+    LocalStorageService store = new LocalStorageService();
+
     var instance = await LocalStorageService.getInstance();
     return instance;
   }
@@ -60,7 +61,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    LocalStorageService store = new LocalStorageService();
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -105,10 +105,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          store.getAllConnection();
           Navigator.pushNamed(
             context,
-            'addConnection',
+            'resultTable',
           );
         },
         tooltip: 'Increment',

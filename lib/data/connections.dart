@@ -1,7 +1,7 @@
 class Connection {
   String name;
   String host;
-  String port;
+  int port;
   String username;
   String password;
   String database;
@@ -19,7 +19,7 @@ class Connection {
   Connection.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     host = json['host'];
-    port = json['port'];
+    port = num.parse(json['port'].toString());
     username = json['username'];
     password = json['password'];
     database = json['database'];
@@ -31,11 +31,12 @@ class Connection {
     }
   }
 
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['name'] = this.name;
     data['host'] = this.host;
-    data['port'] = this.port;
+    data['port'] = this.port.toInt();
     data['username'] = this.username;
     data['password'] = this.password;
     data['database'] = this.database;

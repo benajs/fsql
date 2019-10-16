@@ -6,8 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocalStorageService {
   static LocalStorageService _instance;
   static SharedPreferences _preferences;
+
+  LocalStorageService() {}
+
   static Future<LocalStorageService> getInstance() async {
-    print("Location service instance called");
     if (_instance == null) {
       _instance = LocalStorageService();
     }
@@ -26,7 +28,6 @@ class LocalStorageService {
   }
 
   setConnection(Connection connectionToSave) {
-    print(connectionToSave);
     _preferences.setString(
         connectionToSave.name, json.encode(connectionToSave.toJson()));
   }
@@ -48,5 +49,9 @@ class LocalStorageService {
       allConnections.add(con);
     }
     return allConnections;
+  }
+
+  resetApp() {
+    _preferences.clear();
   }
 }

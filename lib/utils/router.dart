@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fsql/main.dart';
-import 'package:fsql/screens/addDBConnection.dart';
-import 'package:fsql/screens/table.dart';
+import 'package:fsql/screens/addConnection.dart';
+import 'package:fsql/screens/datatable.dart';
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case 'home':
+      case '/':
         return MaterialPageRoute(
             builder: (_) => MyHomePage(title: "Francium SQL"));
       case 'addConnection':

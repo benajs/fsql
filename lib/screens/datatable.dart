@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fsql/data/connections.dart';
-import 'package:fsql/utils/psql.dart';
 import 'package:fsql/utils/store.dart';
 
 class ResultTable extends StatefulWidget {
@@ -23,11 +22,13 @@ class _ResultTableState extends State<ResultTable> {
     super.initState();
   }
 
-  onSortColum(int columnIndex, bool ascending,String field) {
-    if (ascending) {
-      myConnections.sort((a, b) => a.value[field].compareTo(b.name));
-    } else {
-      myConnections.sort((a, b) => b.name.compareTo(a.name));
+  onSortColum(int columnIndex, bool ascending) {
+    if (columnIndex == 0) {
+      if (ascending) {
+        myConnections.sort((a, b) => a.name.compareTo(b.name));
+      } else {
+        myConnections.sort((a, b) => b.name.compareTo(a.name));
+      }
     }
   }
 
@@ -54,63 +55,61 @@ class _ResultTableState extends State<ResultTable> {
     });
   }
 
+  getColumnHeaders(List columns) {
+    List<DataColumn> headers = new List<DataColumn>();
+    for (var col in columns) {
+      DataColumn dc = DataColumn(
+          label: Text(col.toString()),
+          numeric: false,
+          tooltip: col.toString(),
+          onSort: (columnIndex, ascending) {
+            setState(() {
+              sort = !sort;
+            });
+            onSortColum(columnIndex, ascending);
+          });
+      headers.add(dc);
+    }
+    return headers;
+  }
+
+  List<DataRow> getRows(recordsList) {
+    var records = recordsList;
+    List<DataRow> rows = new List<DataRow>();
+    for (var user in records) {
+      rows.add(new DataRow(
+          selected: selectedConnections.contains(user),
+          onSelectChanged: (b) {
+            print("Onselect");
+            onSelectedRow(b, user);
+          },
+          cells: [
+            DataCell(
+              Text(user.name.toString()),
+              onTap: () {
+                print('Selected ${user.name}');
+              },
+            ),
+            DataCell(
+              Text(user.name),
+            ),
+          ]));
+    }
+    print(rows);
+    return rows;
+  }
+
   SingleChildScrollView dataBody() {
-    int sortColumn = 0;
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: DataTable(
-        sortAscending: sort,
-        sortColumnIndex: sortColumn,
-        onSelectAll: (isSelected) {
-          if (isSelected) selectedConnections = myConnections;
-        },
-        columns: [
-          DataColumn(
-              label: Text("NAME"),
-              numeric: false,
-              tooltip: "Connection Name",
-              onSort: (columnIndex, ascending) {
-                setState(() {
-                  sort = !sort;
-                });
-                onSortColum(columnIndex, ascending);
-              }),
-          DataColumn(
-              label: Text("Database"),
-              numeric: false,
-              tooltip: "Database Name",
-              onSort: (columnIndex, ascending) {
-                setState(() {
-                  sortColumn = columnIndex;
-                  sort = !sort;
-                });
-                onSortColum(columnIndex, ascending);
-              }),
-        ],
-        rows: myConnections
-            .map(
-              (conn) => DataRow(
-                  selected: selectedConnections.contains(conn),
-                  onSelectChanged: (b) {
-                    print("Onselect");
-                    DbConnect db = new DbConnect();
-                    db.executeQuery(conn);
-                    onSelectedRow(b, conn);
-                  },
-                  cells: [
-                    DataCell(
-                      Text(conn.name.toString()),
-                      onTap: () {
-                        print('Selected ${conn.name}');
-                      },
-                    ),
-                    DataCell(
-                      Text(conn.database),
-                    ),
-                  ]),
-            )
-            .toList(),
-      ),
+          sortAscending: sort,
+          sortColumnIndex: 0,
+          onSelectAll: (isSelected) {
+            if (isSelected) selectedConnections = myConnections;
+          },
+          columns: getColumnHeaders(["Name", "Host"]),
+          rows: getRows(myConnections)),
     );
   }
 
