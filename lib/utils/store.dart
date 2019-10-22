@@ -41,7 +41,7 @@ class LocalStorageService {
     _preferences.setString(key, content);
   }
 
-  List<Connection> getAllConnection() {
+  List<Connection> getAllConnectionDetails() {
     Set<String> keys = _preferences.getKeys();
     List<Connection> allConnections = new List<Connection>();
     for (var key in keys) {
@@ -49,6 +49,11 @@ class LocalStorageService {
       allConnections.add(con);
     }
     return allConnections;
+  }
+
+  List<String> getAllConnections() {
+    List<String> keys = _preferences.getKeys() as List<String>;
+    return keys;
   }
 
   resetApp() {

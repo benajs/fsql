@@ -1,116 +1,83 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fsql/data/connections.dart';
-import 'package:fsql/utils/store.dart';
 
 class ResultTable extends StatefulWidget {
-  ResultTable({Key key}) : super(key: key);
-  final String title = "Data Table Connections";
-  _ResultTableState createState() => _ResultTableState();
+  ResultTable(this.results, {Key key}) : super(key: key);
+
+  final results;
+  final String title = "Results Table";
+  _ResultTableState createState() => _ResultTableState(results);
 }
 
 class _ResultTableState extends State<ResultTable> {
-  LocalStorageService storageService = new LocalStorageService();
-  List<Connection> myConnections = new List();
-  List<Connection> selectedConnections = new List();
-
+  List<List<dynamic>> results;
+  var records;
+  List<DataColumn> headers;
   bool sort = true;
+
+  _ResultTableState(results) {
+    this.results = results;
+
+    this.headers = getColumnHeaders(this.results.first);
+    this.results.removeAt(0);
+    this.records = getRows(this.results); //TODO
+  }
+
   @override
   void initState() {
-    LocalStorageService.getInstance();
-    myConnections = storageService.getAllConnection();
-    selectedConnections = [];
     super.initState();
   }
 
-  onSortColum(int columnIndex, bool ascending) {
-    if (columnIndex == 0) {
-      if (ascending) {
-        myConnections.sort((a, b) => a.name.compareTo(b.name));
-      } else {
-        myConnections.sort((a, b) => b.name.compareTo(a.name));
-      }
-    }
-  }
-
-  onSelectedRow(bool selected, Connection con) async {
-    setState(() {
-      if (selected) {
-        selectedConnections.add(con);
-      } else {
-        selectedConnections.remove(con);
-      }
-    });
-  }
-
-  deleteSelected() async {
-    setState(() {
-      if (selectedConnections.isNotEmpty) {
-        List<Connection> temp = [];
-        temp.addAll(selectedConnections);
-        for (Connection con in temp) {
-          myConnections.remove(con);
-          selectedConnections.remove(con);
-        }
-      }
-    });
-  }
-
   getColumnHeaders(List columns) {
-    List<DataColumn> headers = new List<DataColumn>();
+    headers = new List<DataColumn>();
     for (var col in columns) {
       DataColumn dc = DataColumn(
-          label: Text(col.toString()),
+          label: Text(
+            col.toString(),
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           numeric: false,
-          tooltip: col.toString(),
-          onSort: (columnIndex, ascending) {
-            setState(() {
-              sort = !sort;
-            });
-            onSortColum(columnIndex, ascending);
-          });
+          tooltip: col.toString());
       headers.add(dc);
     }
     return headers;
   }
 
-  List<DataRow> getRows(recordsList) {
+  List<DataRow> getRows(List recordsList) {
     var records = recordsList;
     List<DataRow> rows = new List<DataRow>();
     for (var user in records) {
-      rows.add(new DataRow(
-          selected: selectedConnections.contains(user),
-          onSelectChanged: (b) {
-            print("Onselect");
-            onSelectedRow(b, user);
-          },
-          cells: [
-            DataCell(
-              Text(user.name.toString()),
-              onTap: () {
-                print('Selected ${user.name}');
-              },
-            ),
-            DataCell(
-              Text(user.name),
-            ),
-          ]));
+      rows.add(new DataRow(cells: buildRow(user)));
     }
-    print(rows);
     return rows;
   }
 
-  SingleChildScrollView dataBody() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: DataTable(
-          sortAscending: sort,
-          sortColumnIndex: 0,
-          onSelectAll: (isSelected) {
-            if (isSelected) selectedConnections = myConnections;
-          },
-          columns: getColumnHeaders(["Name", "Host"]),
-          rows: getRows(myConnections)),
-    );
+  buildRow(record) {
+    List<DataCell> row = new List<DataCell>();
+    for (var value in record) {
+      row.add(DataCell(
+        Text(value.toString()),
+      ));
+    }
+    return row;
+  }
+
+  dataBody() {
+    return CupertinoScrollbar(
+        child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: CupertinoScrollbar(
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: DataTable(
+                        columns: headers,
+                        //getColumnHeaders(["Name", "Host"]),
+                        rows: records)
+                    //getRows(myConnections)),
+                    ))));
   }
 
   @override
@@ -127,42 +94,7 @@ class _ResultTableState extends State<ResultTable> {
             Expanded(
               child: dataBody(),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: OutlineButton(
-                    child: Text('SELECTED ${selectedConnections.length}'),
-                    onPressed: () {},
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: OutlineButton(
-                    child: Text('DELETE SELECTED'),
-                    onPressed: selectedConnections.isEmpty
-                        ? null
-                        : () {
-                            deleteSelected();
-                          },
-                  ),
-                ),
-              ],
-            ),
           ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            storageService.getAllConnection();
-            Navigator.pushNamed(
-              context,
-              'addConnection',
-            );
-          },
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
         ));
   }
 }

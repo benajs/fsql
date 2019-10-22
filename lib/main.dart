@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
   }
 
   getStorage() async {
-    LocalStorageService store = new LocalStorageService();
 
     var instance = await LocalStorageService.getInstance();
     return instance;
@@ -107,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () {
           Navigator.pushNamed(
             context,
-            'resultTable',
+            'connectionTable',
           );
         },
         tooltip: 'Increment',
