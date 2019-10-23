@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fsql/data/connectionList.dart';
 import 'package:fsql/data/connections.dart';
-import 'package:fsql/utils/store.dart';
+import 'package:provider/provider.dart';
 
 class AddConnection extends StatefulWidget {
   AddConnection({AddConnection key}) : super();
@@ -10,7 +11,6 @@ class AddConnection extends StatefulWidget {
 
 class _AddConnectionState extends State<AddConnection> {
   Connection newConnectionData = new Connection();
-  LocalStorageService storageService = new LocalStorageService();
 
   bool hidePassword = true;
 
@@ -22,7 +22,7 @@ class _AddConnectionState extends State<AddConnection> {
 
   @override
   Widget build(BuildContext context) {
-    LocalStorageService.getInstance();
+    final connectionProvider = Provider.of<ConnectionList>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text("Add New connection"),
@@ -118,11 +118,11 @@ class _AddConnectionState extends State<AddConnection> {
                               flex: 2,
                               child: new RaisedButton(
                                 onPressed: () {
-                                  storageService
-                                      .setConnection(newConnectionData);
+                                  connectionProvider
+                                      .addConnection(newConnectionData);
                                   Navigator.pushNamed(
                                     context,
-                                    'resultTable',
+                                    'connectionTable',
                                   );
                                 },
                                 child: new Text('Save'),

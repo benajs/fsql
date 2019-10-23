@@ -14,15 +14,17 @@ class _ResultTableState extends State<ResultTable> {
   var records;
   List<DataColumn> headers;
   bool sort = true;
+  bool hasResults = false;
 
   _ResultTableState(results) {
     this.results = results;
-
-    this.headers = getColumnHeaders(this.results.first);
-    this.results.removeAt(0);
-    this.records = getRows(this.results); //TODO
+    if (results != null) {
+      hasResults = true;
+      this.headers = getColumnHeaders(this.results.first);
+      this.results.removeAt(0);
+      this.records = getRows(this.results);
+    }
   }
-
   @override
   void initState() {
     super.initState();
@@ -80,6 +82,12 @@ class _ResultTableState extends State<ResultTable> {
                     ))));
   }
 
+  emptyBody() {
+    return Container(
+      child: Text("No records available"),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,9 +99,7 @@ class _ResultTableState extends State<ResultTable> {
           mainAxisAlignment: MainAxisAlignment.center,
           verticalDirection: VerticalDirection.down,
           children: <Widget>[
-            Expanded(
-              child: dataBody(),
-            ),
+            Expanded(child: hasResults ? dataBody() : emptyBody()),
           ],
         ));
   }

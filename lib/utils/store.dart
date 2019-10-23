@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocalStorageService {
   static LocalStorageService _instance;
   static SharedPreferences _preferences;
-
-  LocalStorageService() {}
+  static bool isLoaded = false;
+  LocalStorageService();
 
   static Future<LocalStorageService> getInstance() async {
     if (_instance == null) {
@@ -15,6 +15,8 @@ class LocalStorageService {
     }
     if (_preferences == null) {
       _preferences = await SharedPreferences.getInstance();
+      isLoaded = true;
+      print(_preferences);
     }
     return _instance;
   }
@@ -42,11 +44,15 @@ class LocalStorageService {
   }
 
   List<Connection> getAllConnectionDetails() {
-    Set<String> keys = _preferences.getKeys();
     List<Connection> allConnections = new List<Connection>();
-    for (var key in keys) {
-      Connection con = Connection.fromJson(json.decode(_preferences.get(key)));
-      allConnections.add(con);
+
+    if (isLoaded) {
+      Set<String> keys = _preferences.getKeys();
+      for (var key in keys) {
+        Connection con =
+            Connection.fromJson(json.decode(_preferences.get(key)));
+        allConnections.add(con);
+      }
     }
     return allConnections;
   }
