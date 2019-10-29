@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fsql/screens/datatable.dart';
+import 'package:fsql/screens/results.dart';
 
 void main() {
   group("Result table tests: ", () {

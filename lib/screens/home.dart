@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fsql/data/connectionList.dart';
-import 'package:fsql/data/connections.dart';
-import 'package:fsql/utils/psql.dart';
 import 'package:provider/provider.dart';
 
 class ConnectionTable extends StatefulWidget {
@@ -11,19 +9,11 @@ class ConnectionTable extends StatefulWidget {
 }
 
 class _ConnectionTableState extends State<ConnectionTable> {
-  List<List<dynamic>> results;
-
+  var results;
   bool sort = true;
   @override
   void initState() {
     super.initState();
-  }
-
-  connectDB(Connection con) async {
-    results = await executeQuery(con);
-    setState(() {
-      Navigator.pushNamed(context, 'resultTable', arguments: results);
-    });
   }
 
   dataBody() {
@@ -36,7 +26,8 @@ class _ConnectionTableState extends State<ConnectionTable> {
               .map((con) => ListTile(
                     title: Text(con.name),
                     onTap: () {
-                      connectDB(con);
+                      Navigator.pushNamed(context, 'connectionScreen',
+                          arguments: con);
                     },
                   ))
               .toList());
@@ -48,6 +39,7 @@ class _ConnectionTableState extends State<ConnectionTable> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
@@ -74,11 +66,5 @@ class _ConnectionTableState extends State<ConnectionTable> {
         ));
   }
 
-  executeQuery(conn) async {
-    try {
-      DbConnect db = new DbConnect();
-      var results = await db.executeQuery(conn, "");
-      return results;
-    } catch (e) {}
-  }
+
 }

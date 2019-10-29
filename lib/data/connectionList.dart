@@ -7,13 +7,7 @@ class ConnectionList extends ChangeNotifier {
   LocalStorageService storageService = new LocalStorageService();
 
   ConnectionList() {
-    getStorage();
     getConnections();
-  }
-
-  getStorage() async {
-    var instance = await LocalStorageService.getInstance();
-    return instance;
   }
 
   addConnection(newConnectionData) {

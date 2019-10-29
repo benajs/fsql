@@ -10,7 +10,7 @@ class ResultTable extends StatefulWidget {
 }
 
 class _ResultTableState extends State<ResultTable> {
-  List<List<dynamic>> results;
+  var results;
   var records;
   List<DataColumn> headers;
   bool sort = true;
@@ -18,7 +18,7 @@ class _ResultTableState extends State<ResultTable> {
 
   _ResultTableState(results) {
     this.results = results;
-    if (results != null) {
+    if (this.results.runtimeType.toString() == "List<List<dynamic>>") {
       hasResults = true;
       this.headers = getColumnHeaders(this.results.first);
       this.results.removeAt(0);
@@ -74,26 +74,18 @@ class _ResultTableState extends State<ResultTable> {
             child: CupertinoScrollbar(
                 child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
-                    child: DataTable(
-                        columns: headers,
-                        //getColumnHeaders(["Name", "Host"]),
-                        rows: records)
-                    //getRows(myConnections)),
-                    ))));
+                    child: DataTable(columns: headers, rows: records)))));
   }
 
   emptyBody() {
     return Container(
-      child: Text("No records available"),
+      child: Text("Error: \n" + results.toString()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
         body: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
